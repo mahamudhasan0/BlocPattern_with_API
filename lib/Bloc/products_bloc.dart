@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:blocapi/Model/ProductModel.dart';
 import 'package:equatable/equatable.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart'; 
 
 part 'products_event.dart';
 
@@ -12,11 +12,14 @@ class ProductsBloc extends Bloc<ProductsLoadedEvent, ProductsState> {
     on<ProductsLoadedEvent>((event, emit) async {
       try {
         emit(ProductsLoadingState());
-        var response =
-            await http.get(Uri.parse("https://fakestoreapi.com/products"));
-        // ignore: unrelated_type_equality_checks
+
+        final dio = Dio(); // Create a Dio instance
+
+        // Make a GET request using Dio
+        final response = await dio.get("https://fakestoreapi.com/products");
+
         if (response.statusCode == 200) {
-          emit(ProductsLoadedState(productsModelFromJson(response.body)));
+          emit(ProductsLoadedState(productsModelFromJson(response.data)));
         } else {
           throw Exception("Failed To Load");
         }
